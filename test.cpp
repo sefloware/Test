@@ -20,6 +20,7 @@
 #include <boost/spirit/include/phoenix_stl.hpp>
 #include <boost/fusion/include/adapt_struct.hpp>
 #include <boost/variant/recursive_variant.hpp>
+#include <boost/phoenix/operator/if_else.hpp>
 #include <boost/foreach.hpp>
 
 #include <iostream>
@@ -40,7 +41,7 @@ namespace client
 
     template <typename Iterator>
     struct gram
-      : qi::grammar<Iterator, bool(), qi::locals<double>, ascii::space_type>
+      : qi::grammar<Iterator, double(), qi::locals<bool, double>, ascii::space_type>
     {
         gram() : gram::base_type(start)
         {
@@ -50,10 +51,12 @@ namespace client
             using ascii::string;
             using namespace qi::labels;
 
-           start = qi::double_[ _a = _1 ] >> '>' >> qi::double_[ _val = ( _a > _1 ) ]
+           logical = qi::double_[ _a = _1 ] >> '>' >> qi::double_[ _val = ( _a > _1 ) ];
+           start = logical[ _a = _1 ] >> '?' >> qi::double_[_b = _1] >> ':' >> qi::double_[ _val = if_else(_a,_b,_1) ];
         }
 
-        qi::rule<Iterator, bool(), qi::locals<double>, ascii::space_type> start;
+        qi::rule<Iterator, bool(), qi::locals<double>, ascii::space_type> logical;
+        qi::rule<Iterator, double(), qi::locals<bool,double>, ascii::space_type> start;
     };
     //]
 }
@@ -76,7 +79,7 @@ int main(int argc, char **argv)
 
     typedef client::gram<std::string::const_iterator> mini_xml_grammar;
     mini_xml_grammar xml; // Our grammar
-    bool ast; // Our tree
+    double ast; // Our tree
 
     using boost::spirit::ascii::space;
     std::string::const_iterator iter =expstr.begin();

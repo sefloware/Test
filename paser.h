@@ -7,10 +7,10 @@
 #include <utility>
 #include <string>
 #include <map>
+#include <vector>
 #include <cmath>
 
-namespace client
-{
+
 namespace qi = boost::spirit::qi;
 namespace phoenix = boost::phoenix;
 namespace ascii = boost::spirit::ascii;
@@ -20,10 +20,11 @@ namespace ascii = boost::spirit::ascii;
     {
         calculator();
         qi::rule<Iterator, double, ascii::space_type> expression, term, power, factor,start;
+        qi::rule<Iterator,bool(), ascii::space_type> bl, start2;
     };
 
 template <typename Iterator>
-calculator<Iterator>::calculator() :  calculator::base_type(start)
+calculator<Iterator>::calculator() :  calculator::base_type(start2)
 {
     using qi::double_;
     using qi::lexeme;
@@ -48,7 +49,9 @@ calculator<Iterator>::calculator() :  calculator::base_type(start)
     factor =
                 double_             [ qi::_val = qi::_1 ]
             |    '(' >> expression  [ qi::_val = qi::_1 ] >> ')';
+
+    bl = (double_ >> '>' >> double_);
+    start2 = '=' >> bl[ qi::_val = qi::_1 ] >> ( qi::eoi | ';' ) ;
 }
 
-}
 #endif // PASER_H

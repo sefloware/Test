@@ -3,27 +3,27 @@
 
 using namespace std;
 
-double caculate( const std::string &str )
+bool caculate( const std::string &str )
 {
     using boost::spirit::ascii::space;
 
-    double result;
+    bool result;
     std::string::const_iterator iter = str.begin();
-
+    calculator<std::string::const_iterator> calc;
     bool r = phrase_parse(iter, str.end(), calc, space, result);
 
-    if (r && iter == end )
+    if (r && iter == str.end() )
     {
         //Parsing succeeded\n;
         return result;
     }
 
-    return 0.0;
+    return true;
 }
 
 int main()
 {
-    std::string str( " 1+2^2 ");
+    std::string str( " =1>2; ");
     cout << caculate(str) << endl;
     return 0;
 }

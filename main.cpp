@@ -1,66 +1,30 @@
 #include <iostream>
-#include <vector>
-#include <boost/phoenix/core.hpp>
-#include <boost/phoenix/operator.hpp>
-#include <boost/phoenix/statement.hpp>
-#include <boost/phoenix/stl.hpp>
-#include <boost/phoenix/function.hpp>
+#include "paser.h"
 
-//template< typename T1>
-//void print(  T1 y)
-//{
-//    std::cout << y() << std::endl;
-//}
+using namespace std;
 
-//int main()
-//{
-//    using boost::phoenix::ref;
-//    using boost::phoenix::arg_names::arg1;
-//    using boost::phoenix::arg_names::arg2;
-//    using boost::phoenix::if_;
-//    using boost::phoenix::stl::size;
-
-//    int init[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
-//    std::vector<int> v(init, init+10);
-
-//    std::cout << v.size() << std::endl;
-
-//    return 0;
-//}
-
-struct factorial_impl
+double caculate( const std::string &str )
 {
-    template <typename Sig>
-    struct result;
+    using boost::spirit::ascii::space;
 
-    template <typename This, typename Arg>
-    struct result<This(Arg)>
-        : result<This(Arg const &)>
-    {};
+    double result;
+    std::string::const_iterator iter = str.begin();
 
-    template <typename This, typename Arg>
-    struct result<This(Arg &)>
+    bool r = phrase_parse(iter, str.end(), calc, space, result);
+
+    if (r && iter == end )
     {
-        typedef Arg type;
-    };
-
-    template <typename Arg>
-    Arg operator()(Arg n) const
-    {
-        return (n <= 0) ? 1 : n * this->operator()(n-1);
+        //Parsing succeeded\n;
+        return result;
     }
-};
 
+    return 0.0;
+}
 
-int
-main()
+int main()
 {
-    using boost::phoenix::arg_names::arg1;
-    using boost::phoenix::arg_names::arg2;
-    using boost::phoenix::arg_names::arg3;
-    boost::phoenix::function<factorial_impl> factorial;
-    int i = 4;
-    std::cout << ( - arg1 + arg2 + arg3)( 1, 2, 3) << std::endl;
-    std::cout << factorial(arg1)(i) << std::endl;
+    std::string str( " 1+2^2 ");
+    cout << caculate(str) << endl;
     return 0;
 }
+
